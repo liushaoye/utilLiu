@@ -1,7 +1,8 @@
 package com.mrliu.www.utiliu;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import com.mrliu.www.factory.Context;
+
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -97,6 +98,8 @@ public class DateLiuUtil {
      * 时分秒毫秒
      */
     public final static String DEFAULT_PATTERN_DATETIME_TIME_FULL = "HHmmss";
+
+    private static Context context = new Context();
 
 
     /**
@@ -248,17 +251,6 @@ public class DateLiuUtil {
     }
 
 
-
-
-
-
-
-
-
-
-
-    
-
     /**
      * 获取LocalDate转化为字符串
      *
@@ -343,6 +335,44 @@ public class DateLiuUtil {
      */
     private static String getLocalDateTimeString(LocalDateTime localDateTime, DateTimeFormatter dateTimeFormatter) {
         return dateTimeFormatter.format(localDateTime);
+    }
+
+
+    /**
+     * 获取今天星期几
+     *
+     * @param instant JDK8中代替Date使用的类
+     * @return 当前的星期天数
+     */
+    public static String getWeekFromInstant(Instant instant) {
+
+        DayOfWeek dayOfWeek = getDayOfWeek(instant);
+
+        return context.getWeekChineseName(dayOfWeek.getValue());
+    }
+
+    /**
+     * 获取今天星期几
+     *
+     * @param instant JDK8 代替Date使用的类
+     * @return 当前的星期
+     */
+    private static DayOfWeek getDayOfWeek(Instant instant) {
+
+        // ZoneId.systemDefault() 设置当前时区为系统默认时区
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return localDateTime.getDayOfWeek();
+    }
+
+    /**
+     * 输入日期返回日期对应的星期（采用策略设计模式，去除了if else的繁琐判断）
+     *
+     * @param instant 输入当前日期
+     * @return 返回日期对应的星期几
+     */
+    public static Integer getWeekAboutNumber(Instant instant) {
+
+        return context.getWeekNumber(getWeekFromInstant(instant));
     }
 
 

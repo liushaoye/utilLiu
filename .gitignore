@@ -30,8 +30,10 @@ hs_err_pid*
 .idea/inspectionProfiles/
 .idea/misc.xml
 .idea/workspace.xml
+.idea/*.xml
 src/main/java/com/mrliu/www/utiliu/DateUtil.java
 src/main/resources/
 target/generated-sources/
 target/generated-test-sources/
 utilLiu.iml
+target/classes/META-INF/
