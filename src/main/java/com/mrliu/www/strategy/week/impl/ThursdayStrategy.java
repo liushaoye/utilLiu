@@ -1,7 +1,7 @@
-package com.mrliu.www.strategy.impl;
+package com.mrliu.www.strategy.week.impl;
 
 import com.mrliu.www.enums.WeekOfDayEnum;
-import com.mrliu.www.strategy.Strategy;
+import com.mrliu.www.strategy.week.Strategy;
 
 /**
  * @author liuyangos8888

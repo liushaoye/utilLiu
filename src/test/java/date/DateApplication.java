@@ -76,5 +76,29 @@ public class DateApplication {
         // 14、获取星期几对应的数字
         System.out.println(DateLiuUtil.getWeekAboutNumber(Instant.now()));
 
+        // 15、获取今天的最早时间
+        System.out.println(DateLiuUtil.getTodayStartTime(0));
+
+        // 16、获取本月的最早时间
+        System.out.println(DateLiuUtil.getMonthStartTime(0));
+
+        // 17、获取今年的最早时间
+        System.out.println(DateLiuUtil.getYearStartTime(0));
+
+        // 18、获取今天的最晚时间
+        System.out.println(DateLiuUtil.getTodayEndTime());
+
+        // 19、获取本月的最晚时间
+        System.out.println(DateLiuUtil.getMonthEndTime(0));
+
+        // 20、获取今年的最晚时间
+        System.out.println(DateLiuUtil.getYearEndTime(0));
+
+        // 21、获取今天中午的时间
+        System.out.println(DateLiuUtil.getTodayNoonTime());
+
+        // 22、获取某季度的开始日期
+        System.out.println(DateLiuUtil.getQuarterStartTime(-2));
+
     }
 }

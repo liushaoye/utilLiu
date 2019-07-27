@@ -1,10 +1,14 @@
 package com.mrliu.www.utiliu;
 
+import com.mrliu.www.enums.MonthEnum;
 import com.mrliu.www.factory.Context;
+import sun.jvm.hotspot.utilities.memo.MemoizedInt;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author ： liuyangos8888
@@ -373,6 +377,124 @@ public class DateLiuUtil {
     public static Integer getWeekAboutNumber(Instant instant) {
 
         return context.getWeekNumber(getWeekFromInstant(instant));
+    }
+
+
+    /**
+     * 获取天的开始时间
+     *
+     * @param day 0 今天  1 明天 -1 昨天
+     * @return 开始时间
+     */
+    public static LocalDateTime getTodayStartTime(int day) {
+
+        return LocalDate.now().plusDays(day).atStartOfDay();
+
+    }
+
+    /**
+     * 获取某月的开始时间
+     *
+     * @param month 0 本月  1 下月 -1 上月
+     * @return 月开始的时间
+     */
+    public static LocalDate getMonthStartTime(int month) {
+
+        return LocalDate.now().plusMonths(month).with(TemporalAdjusters.firstDayOfMonth());
+    }
+
+
+    /**
+     * 获取某年的开始时间
+     *
+     * @param year 0 今年  1 明年 -1 前年
+     * @return 年的开始时间
+     */
+    public static LocalDate getYearStartTime(int year) {
+
+        return LocalDate.now().plusYears(year).with(TemporalAdjusters.firstDayOfYear());
+    }
+
+
+    /**
+     * 获取某天的结束时间
+     *
+     * @return 天的结束时间  ZoneId.systemDefault()系统默认时区，如果需要改变时区使用ZoneId.of("时区")
+     */
+    public static LocalDateTime getTodayEndTime() {
+
+        return LocalDateTime.of(LocalDate.now(ZoneId.systemDefault()), LocalTime.MIDNIGHT);
+
+    }
+
+    /**
+     * 获取某月的结束时间
+     *
+     * @param day 0 本月  1 下月 -1 上月
+     * @return 月的结束时间
+     */
+    public static LocalDate getMonthEndTime(int day) {
+
+        return LocalDate.now().plusDays(day).with(TemporalAdjusters.lastDayOfMonth());
+
+    }
+
+    /**
+     * 获取某年的结束时间
+     *
+     * @param year 0 今年  1 明年 -1 前年
+     * @return 年的结束时间
+     */
+    public static LocalDate getYearEndTime(int year) {
+
+        return LocalDate.now().plusYears(year).with(TemporalAdjusters.lastDayOfYear());
+    }
+
+    /**
+     * 获取今天中午的时间
+     *
+     * @return 今天中午的时间
+     */
+    public static LocalDateTime getTodayNoonTime() {
+
+        return LocalDateTime.of(LocalDate.now(ZoneId.systemDefault()), LocalTime.NOON);
+
+    }
+
+
+    /**
+     * 获取某季度的开始日期
+     *
+     * @param season 0本季度，1下个季度，-1上个季度，依次类推
+     * @return 日期结果
+     */
+    public static LocalDate getQuarterStartTime(int season) {
+
+        final LocalDate localDate = LocalDate.now().plusMonths(season * 3);
+        //当月
+        int month = localDate.getMonth().getValue();
+
+        int start = 0;
+
+        if (month >= MonthEnum.February.number() && month <= MonthEnum.April.number()) {
+            //第一季度
+            start = 2;
+        } else if (month >= MonthEnum.May.number() && month <= MonthEnum.July.number()) {
+            //第二季度
+            start = 5;
+        } else if (month >= MonthEnum.August.number() && month <= MonthEnum.October.number()) {
+            //第三季度
+            start = 8;
+        } else if ((month >= MonthEnum.November.number() && month <= MonthEnum.December.number())) {
+            //第四季度
+            start = 11;
+        } else if (month == MonthEnum.January.number()) {
+            //第四季度
+            start = 11;
+            month = 13;
+        }
+
+        return localDate.plusMonths(start - month).with(TemporalAdjusters.firstDayOfMonth());
     }
 
 

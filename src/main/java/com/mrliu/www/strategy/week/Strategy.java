@@ -1,4 +1,4 @@
-package com.mrliu.www.strategy;
+package com.mrliu.www.strategy.week;
 
 import java.time.Instant;
 

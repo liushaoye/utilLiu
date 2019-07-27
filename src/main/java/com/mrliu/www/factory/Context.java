@@ -1,6 +1,6 @@
 package com.mrliu.www.factory;
 
-import com.mrliu.www.strategy.Strategy;
+import com.mrliu.www.strategy.week.Strategy;
 
 /**
  * @author liuyangos8888

@@ -1,8 +1,8 @@
 package com.mrliu.www.factory;
 
 import com.mrliu.www.enums.WeekOfDayEnum;
-import com.mrliu.www.strategy.Strategy;
-import com.mrliu.www.strategy.impl.*;
+import com.mrliu.www.strategy.week.Strategy;
+import com.mrliu.www.strategy.week.impl.*;
 
 import java.util.HashMap;
 import java.util.Map;
