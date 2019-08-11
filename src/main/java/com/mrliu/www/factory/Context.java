@@ -62,8 +62,6 @@ public class Context {
 
     public Quarter getQuarterNumber(LocalDate localDate) {
 
-        System.out.println("quarter: "+localDate);
-
         quarterNumberStrategy = QuarterNumberFactory.getInstance().creator(localDate);
 
         return quarterNumberStrategy.getQuarterNumber(localDate);

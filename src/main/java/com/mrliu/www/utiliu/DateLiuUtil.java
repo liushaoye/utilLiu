@@ -1,12 +1,16 @@
 package com.mrliu.www.utiliu;
 
 
+import com.mrliu.www.enums.Quarter;
 import com.mrliu.www.factory.Context;
+import com.mrliu.www.query.TemporalQueryAboutQuarterImpl;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalQuery;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -540,6 +544,7 @@ public class DateLiuUtil {
 
     /**
      * 获取某季度的结束日期
+     *
      * @param season 0本季度，1下个季度，-1上个季度，依次类推
      * @return 日期结果
      */
@@ -555,9 +560,18 @@ public class DateLiuUtil {
     }
 
 
+    /**
+     * 获取某季度的名称和数字
+     *
+     * @param localDate 输入日期
+     * @return 季度的名称和数字
+     */
+    public static Quarter getQuarterNumber(LocalDate localDate) {
 
+        TemporalQuery<Quarter> quarterOfYearQuery = new TemporalQueryAboutQuarterImpl();
 
-
+        return localDate.query(quarterOfYearQuery);
+    }
 
     /**
      * 获取月份
