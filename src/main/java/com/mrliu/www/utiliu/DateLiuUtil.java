@@ -1,14 +1,14 @@
 package com.mrliu.www.utiliu;
 
-import com.mrliu.www.enums.MonthEnum;
-import com.mrliu.www.factory.Context;
-import sun.jvm.hotspot.utilities.memo.MemoizedInt;
 
+import com.mrliu.www.factory.Context;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author ： liuyangos8888
@@ -364,8 +364,18 @@ public class DateLiuUtil {
     private static DayOfWeek getDayOfWeek(Instant instant) {
 
         // ZoneId.systemDefault() 设置当前时区为系统默认时区
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        LocalDateTime localDateTime = getLocalDateAboutInstant(instant);
         return localDateTime.getDayOfWeek();
+    }
+
+    /**
+     * 获取instant 转化的日期格式
+     *
+     * @param instant DK8 代替Date使用的类
+     * @return 时间格式
+     */
+    private static LocalDateTime getLocalDateAboutInstant(Instant instant) {
+        return instantToLocalDateTime(instant);
     }
 
     /**
@@ -379,6 +389,54 @@ public class DateLiuUtil {
         return context.getWeekNumber(getWeekFromInstant(instant));
     }
 
+
+    /**
+     * 获取本周开始时间
+     *
+     * @param localDateTime 输入日期
+     * @return 返回本周开始时间
+     */
+    public static LocalDateTime getTodayFirstOfWeek(LocalDateTime localDateTime) {
+
+        TemporalAdjuster temporalAdjuster = getFirstTemporalAdjuster();
+
+        return localDateTime.with(temporalAdjuster);
+
+    }
+
+    /**
+     * 获取本周结束时间
+     *
+     * @param localDateTime 输入日期
+     * @return 本周结束时间
+     */
+    public static LocalDateTime getTodayLastOfWeek(LocalDateTime localDateTime) {
+
+        TemporalAdjuster temporalAdjuster = getLastTemporalAdjuster();
+
+        return localDateTime.with(temporalAdjuster);
+
+    }
+
+    /**
+     * 本周开始时间
+     *
+     * @return 返回本周开始时间
+     */
+    private static TemporalAdjuster getFirstTemporalAdjuster() {
+        return TemporalAdjusters.ofDateAdjuster(
+                localDate -> localDate.minusDays(localDate.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue()));
+    }
+
+    /**
+     * 本周结束时间
+     *
+     * @return 返回本周结束时间
+     */
+    private static TemporalAdjuster getLastTemporalAdjuster() {
+        return TemporalAdjusters.ofDateAdjuster(
+                localDate -> localDate.plusDays(DayOfWeek.SUNDAY.getValue() - localDate.getDayOfWeek().getValue()));
+    }
 
     /**
      * 获取天的开始时间
@@ -470,32 +528,473 @@ public class DateLiuUtil {
      */
     public static LocalDate getQuarterStartTime(int season) {
 
-        final LocalDate localDate = LocalDate.now().plusMonths(season * 3);
+        LocalDate localDate = LocalDate.now().plusMonths(season * 3);
         //当月
-        int month = localDate.getMonth().getValue();
+        int month = getMonth(localDate.getMonth());
 
-        int start = 0;
+        Integer initMonth = context.getInitMonth(month);
 
-        if (month >= MonthEnum.February.number() && month <= MonthEnum.April.number()) {
-            //第一季度
-            start = 2;
-        } else if (month >= MonthEnum.May.number() && month <= MonthEnum.July.number()) {
-            //第二季度
-            start = 5;
-        } else if (month >= MonthEnum.August.number() && month <= MonthEnum.October.number()) {
-            //第三季度
-            start = 8;
-        } else if ((month >= MonthEnum.November.number() && month <= MonthEnum.December.number())) {
-            //第四季度
-            start = 11;
-        } else if (month == MonthEnum.January.number()) {
-            //第四季度
-            start = 11;
-            month = 13;
-        }
-
-        return localDate.plusMonths(start - month).with(TemporalAdjusters.firstDayOfMonth());
+        return localDate.plusMonths(initMonth).with(TemporalAdjusters.firstDayOfMonth());
     }
 
+
+    /**
+     * 获取某季度的结束日期
+     * @param season 0本季度，1下个季度，-1上个季度，依次类推
+     * @return 日期结果
+     */
+    public static LocalDate getQuarterEndTime(int season) {
+
+        LocalDate localDate = LocalDate.now().plusMonths(season * 3);
+        //当月
+        int month = getMonth(localDate.getMonth());
+
+        Integer initMonth = context.getInitMonth(month);
+
+        return localDate.plusMonths(initMonth).with(TemporalAdjusters.lastDayOfMonth());
+    }
+
+
+
+
+
+
+    /**
+     * 获取月份
+     *
+     * @param month 月份
+     * @return 数值
+     */
+    private static int getMonth(Month month) {
+        return month.getValue();
+    }
+
+
+    /**
+     * 在日期上增加数个整天
+     *
+     * @param instant 输入日期
+     * @param day     增加或减少的天数
+     * @return 增加或减少后的日期
+     */
+    public static LocalDateTime addDay(Instant instant,
+                                       int day
+    ) {
+        LocalDateTime localDateAboutInstant = getLocalDateAboutInstant(instant);
+
+        return localDateAboutInstant.plusDays(day);
+    }
+
+    /**
+     * 在日期上增加/减少（负数）数个小时
+     *
+     * @param instant 输入时间
+     * @param hour    增加/减少的小时数
+     * @return 增加/减少小时后的日期
+     */
+    public static LocalDateTime addDateHour(Instant instant,
+                                            int hour
+    ) {
+
+        LocalDateTime localDateAboutInstant = getLocalDateAboutInstant(instant);
+
+        return localDateAboutInstant.plusHours(hour);
+    }
+
+
+    /**
+     * 在日期上增加/减少数个分钟
+     *
+     * @param instant 输入时间
+     * @param minutes 增加/减少的分钟数
+     * @return 增加/减少分钟后的日期
+     */
+    public static LocalDateTime addDateMinutes(Instant instant,
+                                               int minutes
+    ) {
+
+        LocalDateTime localDateAboutInstant = getLocalDateAboutInstant(instant);
+
+        return localDateAboutInstant.plusMinutes(minutes);
+    }
+
+    /**
+     * 得到两个日期时间的差额(毫秒)
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return 两个时间相差多少秒
+     */
+    public static long differenceDateMillis(LocalDateTime startTime,
+                                            LocalDateTime endTime
+    ) {
+
+        Duration between = Duration.between(startTime, endTime);
+
+        return between.toMillis();
+    }
+
+    /**
+     * 得到两个日期时间的差额(分)
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return 两个时间相差多少分
+     */
+    public static long differenceDateMinutes(LocalDateTime startTime,
+                                             LocalDateTime endTime
+    ) {
+
+        Duration between = Duration.between(startTime, endTime);
+
+        return between.toMinutes();
+    }
+
+    /**
+     * 得到两个日期时间的差额(小时)
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return 两个时间相差多少小时
+     */
+    public static long differenceDateHours(LocalDateTime startTime,
+                                           LocalDateTime endTime
+    ) {
+
+        Duration between = Duration.between(startTime, endTime);
+
+        return between.toHours();
+    }
+
+    /**
+     * 得到两个日期时间的差额(天)
+     *
+     * @param startTime 开始时间
+     * @param endTime   结束时间
+     * @return 两个时间相差多少天
+     */
+    public static long differenceDateDays(LocalDateTime startTime,
+                                          LocalDateTime endTime
+    ) {
+
+        Duration between = Duration.between(startTime, endTime);
+
+        return between.toDays();
+    }
+
+    /**
+     * 获取指定日期的月份
+     *
+     * @param localDateTime 输入日期
+     * @return 返回指定日期的月份
+     */
+    public static int getMonthAboutLocalTime(LocalDateTime localDateTime) {
+
+        Month month = localDateTime.getMonth();
+
+        return getMonth(month);
+    }
+
+    /**
+     * 获取指定日期的年份
+     *
+     * @param localDateTime 输入日期
+     * @return 返回指定日期的年份
+     */
+    public static int getYearAboutLocalTime(LocalDateTime localDateTime) {
+
+        return localDateTime.getYear();
+    }
+
+    /**
+     * 获取指定日期的天数
+     *
+     * @param localDateTime 输入日期
+     * @return 返回指定日期的天数
+     */
+    public static int getDayAboutLocalTime(LocalDateTime localDateTime) {
+
+        return localDateTime.getDayOfMonth();
+    }
+
+    /**
+     * 获取指定日期的星期
+     *
+     * @param localDateTime 输入日期
+     * @return 返回指定日期的星期
+     */
+    public static int getWeekDayAboutLocalTime(LocalDateTime localDateTime) {
+
+        return localDateTime.getDayOfWeek().getValue();
+    }
+
+    /**
+     * 获取指定日期的时间
+     *
+     * @param localDateTime 输入日期
+     * @return 返回指定日期的时间
+     */
+    public static int getHouryAboutLocalTime(LocalDateTime localDateTime) {
+
+        return localDateTime.getHour();
+    }
+
+
+    /**
+     * 获取指定日期的所在月的最后一天
+     *
+     * @param localDateTime 输入日期
+     * @return 返回指定日期的时间
+     */
+    public static int getLateDayFromMonth(LocalDateTime localDateTime) {
+
+        return localDateTime.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+    }
+
+
+    /**
+     * 获取指定日期的所在月的第一天
+     *
+     * @param localDateTime 输入日期
+     * @return 返回指定日期的时间
+     */
+    public static LocalDateTime getFirstDayFromMonth(LocalDateTime localDateTime) {
+
+        return localDateTime.with(TemporalAdjusters.firstDayOfMonth());
+    }
+
+
+    public static LocalDateTime getDayOfWeek(Instant instant, int week) {
+
+
+        LocalDateTime localDateTime = instantToLocalDateTime(instant);
+
+        DayOfWeek plus = localDateTime.getDayOfWeek().plus(week);
+
+        return addDay(localDateTime.atZone(ZoneId.systemDefault()).toInstant(), plus.getValue() - week);
+
+    }
+
+    /**
+     * 获取到指定日期一个月有几天
+     *
+     * @param instant 输入日期
+     * @return 天数
+     */
+    public static int getDayCountOfMonth(Instant instant) {
+        LocalDateTime localDateTime = instantToLocalDateTime(instant);
+
+        LocalDateTime startTime = localDateTime.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDateTime endTime = localDateTime.with(TemporalAdjusters.lastDayOfMonth());
+
+        Duration between = Duration.between(startTime, endTime);
+
+        return (int) between.toDays() + 1;
+    }
+
+
+    /**
+     * 当前时间10位毫秒数
+     *
+     * @return 10位秒
+     */
+    public static long getNowOfSecond() {
+
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        return localDateTimeToInstant(localDateTime).plusMillis(TimeUnit.HOURS.toMillis(8)).getEpochSecond();
+    }
+
+    /**
+     * 当前时间13位毫秒数
+     *
+     * @return 13位毫秒数
+     */
+    public static long getNowOfMillion() {
+
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        return localDateTimeToInstant(localDateTime).toEpochMilli();
+    }
+
+    /**
+     * 当前时间13位毫秒数
+     *
+     * @return 13位毫秒数
+     */
+    public static long getNowOfMillions() {
+
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        return localDateTimeToInstant(localDateTime).plusMillis(TimeUnit.HOURS.toMillis(8)).toEpochMilli();
+    }
+
+
+    /**
+     * LocalDateTime 转化为 Instant
+     *
+     * @param localDateTime 输入的时间
+     * @return Instant的日期类型
+     */
+    public static Instant localDateTimeToInstant(LocalDateTime localDateTime) {
+
+        return localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+    }
+
+    /**
+     * LocalDateTime 转化为 LocalDate
+     *
+     * @param localDateTime 输入的时间
+     * @return LocalDate的日期类型
+     */
+    public static LocalDate localDateTimeTolocalDate(LocalDateTime localDateTime) {
+
+        return localDateTime.toLocalDate();
+    }
+
+
+    /**
+     * LocalDate 转化为 LocalDateTime
+     *
+     * @param localDate 输入的时间
+     * @return LocalDateTime的日期类型
+     */
+    public static LocalDateTime localDateTimeTolocalDate(LocalDate localDate) {
+
+        return localDate.atStartOfDay(ZoneOffset.ofHours(8)).toLocalDateTime();
+    }
+
+    /**
+     * instant  转化为 LocalDateTime
+     *
+     * @param instant 输入的时间
+     * @return LocalDateTime的日期类型
+     */
+    public static LocalDateTime instantToLocalDateTime(Instant instant) {
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+    }
+
+    /**
+     * instant  转化为 LocalDate
+     *
+     * @param instant 输入的时间
+     * @return LocalDate的日期类型
+     */
+    public static LocalDate instantToLocalDate(Instant instant) {
+        return instant.atZone(ZoneOffset.ofHours(8)).toLocalDate();
+    }
+
+
+    /**
+     * 获取本周的周一日期
+     *
+     * @return 获取本周的周一日期
+     */
+    public static LocalDateTime getMondayThisWeek() {
+
+        LocalDateTime todayFirstOfWeek = getTodayFirstOfWeek(getTodayStartTime(0));
+
+        return todayFirstOfWeek.with(getFirstTemporalAdjuster());
+
+    }
+
+
+    /**
+     * 获取本周的周日日期
+     *
+     * @return 获取本周的周日日期
+     */
+    public static LocalDateTime getSundayThisWeek() {
+
+        LocalDateTime todayFirstOfWeek = getTodayLastOfWeek(getTodayStartTime(0));
+
+        return todayFirstOfWeek.with(getFirstTemporalAdjuster());
+
+    }
+
+    /**
+     * 获取上周周一的日期
+     *
+     * @return 获取上周周一的日期
+     */
+    public static LocalDateTime getMondayPreviousWeek() {
+
+        return getMondayThisWeek().minusDays(7);
+
+    }
+
+    /**
+     * 获取上周周日的日期
+     *
+     * @return 获取上周周日的日期
+     */
+    public static LocalDateTime getSundayPreviousWeek() {
+
+        return getSundayThisWeek().minusDays(8);
+
+    }
+
+
+    /**
+     * LocalDate转时间戳
+     *
+     * @param localDate 时间输入
+     * @return 时间戳
+     */
+    public static Long getLocalDateToMillis(LocalDate localDate) {
+
+        return localDate.atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli();
+
+    }
+
+    /**
+     * LocalDateTime转时间戳
+     *
+     * @param localDateTime 时间输入
+     * @return 时间戳
+     */
+    public static Long getLocalDateTimeToMillis(LocalDateTime localDateTime) {
+
+        return localDateTime.toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+
+    }
+
+    /**
+     * 毫秒值转LocalDate
+     *
+     * @param timeStamp 时间戳毫秒值
+     * @return LocalDate
+     */
+    public static LocalDate getMillisToLocalDate(long timeStamp) {
+
+        return Instant.ofEpochMilli(timeStamp).atZone(ZoneOffset.ofHours(8)).toLocalDate();
+
+    }
+
+    /**
+     * 毫秒值转LocalDateTime
+     *
+     * @param timeStamp 时间戳毫秒值
+     * @return LocalDateTime
+     */
+    public static LocalDateTime getMillisToLocalDateTime(long timeStamp) {
+
+        return Instant.ofEpochMilli(timeStamp).atZone(ZoneOffset.ofHours(8)).toLocalDateTime();
+
+    }
+
+
+    /**
+     * 毫秒值加一年后的毫秒值
+     *
+     * @param original 毫秒值
+     * @return 毫秒值
+     */
+    public static long getNextYear(long original) {
+
+        LocalDateTime millisToLocalDateTime = getMillisToLocalDateTime(original);
+
+        return millisToLocalDateTime.minus(1, ChronoUnit.YEARS).toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+    }
 
 }

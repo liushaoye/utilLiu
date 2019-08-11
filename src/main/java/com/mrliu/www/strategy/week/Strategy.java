@@ -1,7 +1,5 @@
 package com.mrliu.www.strategy.week;
 
-import java.time.Instant;
-
 /**
  * @author liuyangos8888
  */
@@ -21,4 +19,5 @@ public interface Strategy {
      * @return 对应的汉字星期几
      */
     String getWeekChineseName(Integer dayOfWeek);
+
 }

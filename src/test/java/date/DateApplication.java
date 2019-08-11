@@ -100,5 +100,39 @@ public class DateApplication {
         // 22、获取某季度的开始日期
         System.out.println(DateLiuUtil.getQuarterStartTime(-2));
 
+        // 23、在日期上增加数个整天
+        System.out.println(DateLiuUtil.addDay(Instant.now(),5));
+
+        // 24、在日期上减少数个整天
+        System.out.println(DateLiuUtil.addDay(Instant.now(),-5));
+
+        // 25、在日期上增加数个小时
+        System.out.println(DateLiuUtil.addDateHour(Instant.now(),15));
+
+        // 26、在日期上减少数个小时
+        System.out.println(DateLiuUtil.addDateHour(Instant.now(),-15));
+
+        // 27、在日期上增加数个分钟
+        System.out.println(DateLiuUtil.addDateMinutes(Instant.now(),15));
+
+        // 28、在日期上减少数个分钟
+        System.out.println(DateLiuUtil.addDateMinutes(Instant.now(),-15));
+
+        // 29、得到两个日期时间的差额(毫秒)
+        System.out.println(DateLiuUtil.differenceDateMillis(LocalDateTime.now(),LocalDateTime.of(1991,4,12,20,0,0)));
+
+        // 30、得到两个日期时间的差额(分)
+        System.out.println(DateLiuUtil.differenceDateMinutes(LocalDateTime.now(),LocalDateTime.of(1991,4,12,20,0,0)));
+
+        // 31、得到两个日期时间的差额(小时)
+        System.out.println(DateLiuUtil.differenceDateHours(LocalDateTime.now(),LocalDateTime.of(1991,4,12,20,0,0)));
+
+        //32、得到两个日期时间的差额(天)
+        System.out.println(DateLiuUtil.differenceDateDays(LocalDateTime.now(),LocalDateTime.of(1991,4,12,20,0,0)));
+
+
+
+
+
     }
 }
